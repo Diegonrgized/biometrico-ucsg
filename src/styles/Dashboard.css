@@ -1,0 +1,331 @@
+/* GENERAL */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+  background-color: #eeeeee;
+  color: #1a1a1a;
+}
+
+/* Fondo consistente para el root en React */
+#root {
+  min-height: 100vh;
+  background-color: #eeeeee;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Wrapper */
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  justify-content: flex-start;
+  background-color: #eeeeee;
+}
+
+/* HEADER */
+.dashboard-header {
+  width: 100%;
+  height: 50px;
+  background-color: #4d0f0f;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 25px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dashboard-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-logo img {
+  height: 38px;
+}
+
+.dashboard-logo span {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.user-dropdown {
+  position: relative;
+}
+
+.user-dropdown button {
+  background: transparent;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 35px;
+  background: white;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 140px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.dropdown-menu button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+  background: #f0f0f0;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.dashboard-main-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 30px auto 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding: 0 20px;
+  background-color: #eeeeee;
+}
+
+.panel-superior {
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  gap: 15px;
+  position: relative;
+}
+
+/* Encabezado materia y semestre */
+.materia-encabezado {
+  flex: 1 1 100%;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Botones y datos */
+.acciones-rapidas {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin: 10px 0;
+}
+
+.accion-btn {
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100px;
+  height: 80px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  color: #1a1a1a;
+  font-weight: bold;
+}
+
+.datos-materia {
+  width: 100%;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.reloj-refrescar {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  text-align: right;
+}
+
+.refrescar-btn {
+  border: none;
+  background: none;
+  color: #0077c2;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.hora-fecha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.icono-hora {
+  font-size: 20px;
+}
+
+.hora-actual {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.fecha-hoy {
+  font-size: 12px;
+  color: #555;
+}
+
+/* PANEL INFERIOR EN DOS COLUMNAS */
+.panel-inferior {
+  display: flex;
+  gap: 20px;
+}
+
+.panel-materias,
+.panel-materias-cerradas {
+  flex: 1;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ENCABEZADOS DE CADA PANEL */
+.panel-title {
+  background-color: #000;
+  color: white;
+  padding: 8px 12px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.panel-materias-cerradas .panel-title {
+  background-color: #800000;
+}
+
+.panel-content {
+  padding: 15px;
+  font-size: 14px;
+}
+
+.panel-content p {
+  margin: 6px 0;
+}
+
+/* BLOQUE MATERIA */
+.bloque-materia {
+  margin-top: 10px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.bloque-materia p {
+  margin: 6px 0;
+}
+
+.bloque-materia a {
+  color: #0047ab;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.bloque-materia a:hover {
+  text-decoration: underline;
+}
+
+.bloque-materia button,
+.btn-ingresar {
+  margin-top: 12px;
+  background-color: #800000;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-ingresar:hover,
+.bloque-materia button:hover {
+  background-color: #5a0000;
+}
+
+/* REFUERZO DE COLOR */
+.dashboard-content * {
+  color: #1a1a1a !important;
+  opacity: 1 !important;
+}
+
+html, body {
+  background-color: #eeeeee !important;
+  overflow-x: hidden !important;
+}
+
+/* Opcional: fuerza a que no se salga nada */
+* {
+  box-sizing: border-box;
+  max-width: 100vw;
+}
+
+/* ✅ MODAL DE ALERTA DE BIOMETRÍA */
+.modal-alerta {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-contenido {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  text-align: center;
+  max-width: 400px;
+}
+
+.modal-contenido h3 {
+  color: #861818;
+  margin-bottom: 10px;
+}
+
+.modal-contenido button {
+  margin-top: 15px;
+  background-color: #861818;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}

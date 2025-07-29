@@ -1,0 +1,127 @@
+.horario-estudiante-container {
+  background-color: #f4f6f8;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* 🔴 Encabezado institucional */
+.horario-header {
+  background-color: #96012a;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 30px;
+  height: 70px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.logo-ucsg {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-ucsg img {
+  height: 42px;
+}
+
+.logo-ucsg span {
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.hora-actual {
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 📅 Fecha */
+.titulo-fecha {
+  text-align: center;
+  font-size: 26px;
+  margin: 25px 0 15px;
+  color: #2a2a2a;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* 🧾 Tabla principal */
+.tabla-horario {
+  width: 95%;
+  max-width: 1200px;
+  margin: auto;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+}
+
+.tabla-horario thead {
+  background-color: #dce7ff;
+}
+
+.tabla-horario th,
+.tabla-horario td {
+  padding: 14px;
+  text-align: center;
+  font-size: 15px;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+.tabla-horario th {
+  font-weight: bold;
+  color: #222;
+  text-transform: uppercase;
+}
+
+.tabla-horario tbody tr:hover {
+  background-color: #f7fbff;
+}
+
+/* Estado general: ocupa todo el ancho de la celda */
+.estado {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px 0;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Estado: EN CLASE */
+.estado.en_clase {
+  background-color: #d1f9d6;
+  color: #15803d;
+  border: 1px solid #98e2a6;
+}
+
+/* Estado: FINALIZADA */
+.estado.finalizada {
+  background-color: #e0e0e0;
+  color: #3a3a3a;
+  border: 1px solid #c0c0c0;
+}
+
+/* Estado: PENDIENTE */
+.estado.pendiente {
+  background-color: #fff0b3;
+  color: #8c6d00;
+  border: 1px solid #ffe082;
+}
+
+/* Estado: AUSENTE */
+.estado.ausente {
+  background-color: #ffcdd2;
+  color: #b71c1c;
+  border: 1px solid #ef9a9a;
+}

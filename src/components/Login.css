@@ -1,0 +1,135 @@
+/* Fondo general */
+body, html {
+  background-color: #edeef0;
+  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Fondo con efecto marca de agua */
+.login-background {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.login-background::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("../assets/fondo_login.jpg"); /* ✅ Ruta relativa correcta */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.8;
+  filter: brightness(0.4) grayscale(30%);
+  z-index: 0;
+}
+
+/* Contenedor encima del fondo */
+.login-container {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Caja del login */
+.login-box {
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 40px 50px;
+  width: 400px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  text-align: left;
+  border-top: 4px solid #7a0c0c;
+}
+
+/* Logo */
+.logo {
+  width: 180px;
+  margin-bottom: 15px;
+}
+
+/* Título */
+.login-box h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Inputs */
+.login-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Botón Login */
+.btn-login {
+  width: 100%;
+  background-color: #7a0c0c;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.btn-login:hover {
+  background-color: #5a0909;
+}
+
+/* Botón facial */
+.btn-facial {
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn-facial:hover {
+  background-color: #555;
+}
+
+/* Caja de reconocimiento facial */
+.facial-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.webcam {
+  width: 300px;
+  height: auto;
+  border: 2px solid #7a0c0c;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+/* Mensaje */
+.login-box p {
+  font-size: 14px;
+  color: #333;
+  margin-top: 5px;
+}
+
+/* Mensaje de éxito (💡 este selector no funciona en CSS puro, mejor usar clases dinámicas desde React si quieres cambiar color condicional) */
+/*
+.login-box p:contains("✅") {
+  color: green;
+}
+*/

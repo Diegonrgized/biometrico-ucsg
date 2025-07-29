@@ -1,0 +1,106 @@
+/* Fondo con efecto marca de agua */
+.registro-background {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.registro-background::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("../assets/Registro_imagen.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.; /* Marca de agua tenue */
+  filter: brightness(0.4) grayscale(20%);
+  z-index: 0;
+}
+
+/* Contenedor del contenido encima del fondo */
+.registro-facial-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Caja del formulario */
+.registro-facial-box {
+  background: #fff;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 350px;
+}
+
+/* Webcam */
+.webcam {
+  width: 100%;
+  height: auto;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 2px solid #ccc;
+}
+
+/* Campo de texto */
+.registro-facial-box input {
+  width: 90%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Botón registrar */
+.btn-registrar {
+  width: 100%;
+  background: #7a0c0c;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.btn-registrar:hover {
+  background: #5a0808;
+}
+
+/* Botón regresar */
+.btn-regresar {
+  width: 100%;
+  background: #ccc;
+  color: black;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Mensaje inferior */
+.mensaje {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.btn-camara {
+  width: 100%;
+  background-color: #444;
+  color: white;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.btn-camara:hover {
+  background-color: #666;
+}
