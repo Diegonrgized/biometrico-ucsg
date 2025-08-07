@@ -3,16 +3,17 @@ import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // <-- Importación de SweetAlert2
 import "../styles/RegistroFacial.css";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 export default function RegistroFacial() {
-  const [nombre, setNombre] = useState("");
-  const [mensaje, setMensaje] = useState("");
-  const [camaraActiva, setCamaraActiva] = useState(false); // ✅ NUEVO estado
+  const [camaraActiva, setCamaraActiva] = useState(false);
   const webcamRef = useRef(null);
   const navigate = useNavigate();
+
+  const userId = localStorage.getItem("usuarioId");
 
   useEffect(() => {
     const cargarModelos = async () => {
@@ -23,30 +24,43 @@ export default function RegistroFacial() {
         console.log("✅ Modelos cargados para registro facial");
       } catch (error) {
         console.error("❌ Error cargando modelos:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar modelos",
+          text: "No se pudieron cargar los modelos de reconocimiento.",
+        });
       }
     };
     cargarModelos();
   }, []);
 
-  const generarIdAleatorio = () => {
-    return Math.floor(100000 + Math.random() * 900000);
-  };
-
-  const registrarProfesor = async () => {
-    if (!nombre.trim()) {
-      setMensaje("⚠️ Por favor ingresa un nombre antes de registrar.");
+  const registrarRostro = async () => {
+    if (!userId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Usuario no identificado",
+        text: "Inicia sesión antes de registrar el rostro.",
+      });
       return;
     }
 
     if (!webcamRef.current || !camaraActiva) {
-      setMensaje("⚠️ Cámara no disponible o apagada.");
+      Swal.fire({
+        icon: "warning",
+        title: "Cámara inactiva",
+        text: "Activa la cámara antes de registrar.",
+      });
       return;
     }
 
     try {
       const video = webcamRef.current.video;
       if (!video || video.readyState !== 4) {
-        setMensaje("⚠️ La cámara aún no está lista.");
+        Swal.fire({
+          icon: "info",
+          title: "Cámara no lista",
+          text: "Espera a que se inicialice completamente.",
+        });
         return;
       }
 
@@ -56,61 +70,65 @@ export default function RegistroFacial() {
         .withFaceDescriptor();
 
       if (!detections) {
-        setMensaje("❌ No se detectó ningún rostro, intenta nuevamente.");
+        Swal.fire({
+          icon: "error",
+          title: "Sin rostro detectado",
+          text: "Asegúrate de estar visible en la cámara.",
+        });
         return;
       }
 
       const encodingArray = Array.from(detections.descriptor);
-      const profesorId = generarIdAleatorio();
 
-      const response = await axios.post(`${API_BASE_URL}/profesores`, {
-        id: profesorId,
-        nombre: nombre,
+      const response = await axios.post(`${API_BASE_URL}/usuarios/${userId}/guardar-rostro`, {
         face_encoding: JSON.stringify(encodingArray),
       });
 
-      if (response.status === 201) {
-        setMensaje(`✅ Profesor registrado con éxito: ${nombre} (ID: ${profesorId})`);
-        setNombre("");
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "¡Rostro registrado!",
+          text: "Tu rostro ha sido guardado exitosamente.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       }
     } catch (error) {
-      console.error("❌ Error al registrar el profesor:", error);
-      setMensaje("❌ No se pudo registrar el profesor. Revisa la consola.");
+      console.error("❌ Error al registrar el rostro:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error en el registro",
+        text: "No se pudo guardar el rostro. Intenta nuevamente.",
+      });
     }
   };
 
   const alternarCamara = () => {
     setCamaraActiva((prev) => !prev);
-    setMensaje("");
   };
 
   return (
     <div className="registro-background">
       <div className="registro-facial-wrapper">
         <div className="registro-facial-box">
-          <h2>Registro Facial de Profesores</h2>
+          <h2>Registro Facial</h2>
 
-          {/* ✅ Botón para encender/apagar cámara */}
+          <div className="recomendaciones">
+            <p><strong>🛈 Recomendaciones:</strong> Ubíquese de frente, con buena luz, sin accesorios y con expresión neutral.</p>
+          </div>
+
           <button className="btn-camara" onClick={alternarCamara}>
             {camaraActiva ? "Desactivar Cámara" : "Activar Cámara"}
           </button>
 
-          {/* ✅ Webcam solo si está activa */}
           {camaraActiva && <Webcam ref={webcamRef} className="webcam" />}
 
-          <input
-            type="text"
-            placeholder="Nombre del profesor"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-          />
-          <button className="btn-registrar" onClick={registrarProfesor}>
+          <button className="btn-registrar" onClick={registrarRostro}>
             Registrar Rostro
           </button>
-          <button className="btn-regresar" onClick={() => navigate("/dashboard")}>
-            🔙 Regresar al Dashboard
+          <button className="btn-regresar" onClick={() => navigate("/")}>
+            🔙 Regresar al Login
           </button>
-          <p className="mensaje">{mensaje}</p>
         </div>
       </div>
     </div>

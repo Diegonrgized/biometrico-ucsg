@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
@@ -9,25 +10,9 @@ export default function Dashboard() {
   const [horaActual, setHoraActual] = useState("");
   const [showMenu, setShowMenu] = useState(false);
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [nombreUsuario, setNombreUsuario] = useState("Usuario");
+  const [usuarioId, setUsuarioId] = useState(null);
   const navigate = useNavigate();
-
-  // ✅ Verificar si el profesor tiene biometría registrada
-  useEffect(() => {
-    const verificarBiometria = async () => {
-      const nombreProfesor = localStorage.getItem("nombreProfesor") || "Ismael Sosa";
-      try {
-        const response = await axios.get(`${API_BASE_URL}/profesores`);
-        const profesor = response.data.find(p => p.nombre === nombreProfesor);
-        if (!profesor || !profesor.face_encoding) {
-          setMostrarModal(true);
-        }
-      } catch (error) {
-        console.error("❌ Error al verificar registro biométrico:", error);
-      }
-    };
-
-    verificarBiometria();
-  }, []);
 
   useEffect(() => {
     const actualizarHora = () => {
@@ -45,8 +30,44 @@ export default function Dashboard() {
     return () => clearInterval(intervalo);
   }, []);
 
+  useEffect(() => {
+    const id = localStorage.getItem("usuarioId");
+    if (!id) return;
+    setUsuarioId(id);
+
+    const obtenerUsuario = async () => {
+      try {
+        const resUsuarios = await axios.get(`${API_BASE_URL}/usuarios`);
+        const usuario = resUsuarios.data.find((u) => u.id == id);
+
+        if (!usuario) return;
+
+        setNombreUsuario(usuario.name || "Usuario");
+
+        if (!usuario.face_encoding) {
+          setMostrarModal(true);
+        }
+      } catch (error) {
+        console.error("❌ Error al cargar usuario:", error);
+      }
+    };
+
+    obtenerUsuario();
+  }, []);
+
+  const handleRefrescar = () => {
+    Swal.fire({
+      icon: "info",
+      title: "Vista actualizada",
+      text: "Se ha actualizado la vista del panel.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  };
+
   const handleLogout = () => {
-    navigate("/"); // ✅ Vuelve al login
+    localStorage.clear();
+    navigate("/");
   };
 
   const mostrarAlerta = (titulo) => {
@@ -66,14 +87,13 @@ export default function Dashboard() {
       )}
 
       <header className="dashboard-header">
-        <div className="header-left">
-        </div>
+        <div className="header-left"></div>
         <div className="header-center">
           <div className="titulo-sistema">Centro de Apoyo Docente</div>
         </div>
         <div className="header-right">
           <div className="user-dropdown">
-            <button onClick={() => setShowMenu(!showMenu)}>Ismael Sosa ▾</button>
+            <button onClick={() => setShowMenu(!showMenu)}>{nombreUsuario} ▾</button>
             {showMenu && (
               <div className="dropdown-menu">
                 <button onClick={handleLogout}>Cerrar sesión</button>
@@ -84,7 +104,6 @@ export default function Dashboard() {
       </header>
 
       <main className="dashboard-main-container">
-        {/* Panel superior */}
         <section className="panel-superior">
           <div className="materia-encabezado">
             <h3>COMPUTACIÓN (R)</h3>
@@ -116,7 +135,7 @@ export default function Dashboard() {
           </div>
 
           <div className="reloj-refrescar">
-            <button className="refrescar-btn">🔄 Refrescar</button>
+            <button className="refrescar-btn" onClick={handleRefrescar}>🔄 Refrescar</button>
             <div className="hora-fecha">
               <div className="icono-hora">🕒</div>
               <div>
@@ -134,7 +153,6 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Panel inferior en dos columnas */}
         <section className="panel-inferior">
           <div className="panel-materias">
             <div className="panel-title">Materias por dictar Hoy</div>

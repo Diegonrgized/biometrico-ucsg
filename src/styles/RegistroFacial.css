@@ -104,3 +104,15 @@
 .btn-camara:hover {
   background-color: #666;
 }
+
+.recomendaciones {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left: 4px solid #ffc107;
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  text-align: left;
+  box-shadow: 0 0 2px rgba(0,0,0,0.1);
+}

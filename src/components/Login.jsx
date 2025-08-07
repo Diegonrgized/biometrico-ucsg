@@ -4,6 +4,7 @@ import * as faceapi from "face-api.js";
 import axios from "axios";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
@@ -11,7 +12,6 @@ export default function Login({ onLoginSuccess }) {
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [faceMode, setFaceMode] = useState(false);
-  const [mensaje, setMensaje] = useState("");
   const webcamRef = useRef(null);
   const navigate = useNavigate();
 
@@ -24,69 +24,131 @@ export default function Login({ onLoginSuccess }) {
         console.log("✅ Modelos cargados correctamente");
       } catch (error) {
         console.error("❌ Error cargando modelos:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar modelos",
+          text: "No se pudo cargar face-api.js",
+        });
       }
     };
     cargarModelos();
   }, []);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (usuario === "admin" && contrasena === "1234") {
-      const profesorId = 123456;
-      localStorage.setItem("profesorId", profesorId);
-      setMensaje("✅ Login tradicional exitoso");
+    try {
+      const response = await axios.post(`${API_BASE_URL}/login`, {
+        email: usuario,
+        password: contrasena,
+      });
+
+      const user = response.data;
+      localStorage.setItem("usuarioId", user.user_id);
+      localStorage.setItem("nombreUsuario", user.name);
+
+      await actualizarClaseEnCurso(user.user_id, user.name);
       onLoginSuccess();
       navigate("/dashboard");
-    } else {
-      setMensaje("❌ Credenciales incorrectas");
+    } catch (error) {
+      console.error("❌ Error al iniciar sesión:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Credenciales inválidas",
+        text: "Verifica tu correo y contraseña",
+      });
     }
   };
 
-  const actualizarClaseEnCurso = async (profesorId, nombreProfesor) => {
+  const actualizarClaseEnCurso = async (userId, nombreUsuario) => {
     try {
       const resp = await axios.get(`${API_BASE_URL}/clases`);
       const clases = resp.data;
+      const ahora = new Date();
 
-      const claseVigente = clases.find(
-        (c) => c.profesor_id === profesorId && ["PENDIENTE", "EN_CLASE"].includes(c.estado)
-      );
+      console.log("🕐 Hora actual del navegador:", ahora.toLocaleString("es-EC"));
+      console.log("🔍 Buscando clase para usuario:", userId);
+
+      clases.forEach((c) => {
+        console.log(
+          `Clase ID ${c.id} - estado: ${c.estado} - user_id: ${c.user_id} - inicio: ${c.hora_inicio} - fin: ${c.hora_fin}`
+        );
+      });
+
+      const claseVigente = clases.find((c) => {
+        if (String(c.user_id) !== String(userId) || c.estado !== "PENDIENTE") return false;
+
+        const inicioHoy = new Date(c.hora_inicio);
+        const finHoy = new Date(c.hora_fin);
+        const dentroHorario = ahora >= inicioHoy && ahora <= finHoy;
+
+        console.log("⏱ Comparación detallada:");
+        console.log("➡️ Hora actual      :", ahora.toLocaleString("es-EC"));
+        console.log("🟢 Hora inicio clase:", inicioHoy.toLocaleString("es-EC"));
+        console.log("🔴 Hora fin clase   :", finHoy.toLocaleString("es-EC"));
+        console.log("✅ ¿Dentro del horario?:", dentroHorario);
+
+        return dentroHorario;
+      });
+
+      console.log("🧪 Resultado de búsqueda de clase vigente:", claseVigente);
 
       if (claseVigente) {
         await axios.put(`${API_BASE_URL}/clases/${claseVigente.id}/estado`, {
           estado: "EN_CLASE",
         });
-        console.log(`✅ Clase ${claseVigente.id} actualizada a EN_CLASE`);
-        setMensaje(`✅ Rostro autentificado con éxito: ${nombreProfesor} (Clase actualizada)`);
+
+        Swal.fire({
+          icon: "success",
+          title: `Clase actualizada a en Clase`,
+          text: `Bienvenido ${nombreUsuario}`,
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
-        setMensaje(`✅ Rostro autentificado con éxito: ${nombreProfesor} (Sin clase vigente)`);
+        Swal.fire({
+          icon: "info",
+          title: `Autenticado correctamente`,
+          text: `Hola ${nombreUsuario}, no tiene clase vigente.`,
+          timer: 2500,
+          showConfirmButton: false,
+        });
       }
 
-      localStorage.setItem("profesorId", profesorId);
-      onLoginSuccess();
-      navigate("/dashboard");
+      localStorage.setItem("usuarioId", userId);
+      localStorage.setItem("nombreUsuario", nombreUsuario);
     } catch (error) {
       console.error("❌ Error al actualizar clase:", error);
-      setMensaje("⚠️ Rostro reconocido, pero no se pudo actualizar la clase.");
-      localStorage.setItem("profesorId", profesorId);
-      onLoginSuccess();
-      navigate("/dashboard");
+      Swal.fire({
+        icon: "warning",
+        title: "Clase no actualizada",
+        text: "Rostro reconocido, pero no se pudo actualizar el estado de clase.",
+      });
     }
   };
 
   const iniciarReconocimiento = async () => {
     setFaceMode(true);
-    setMensaje("Iniciando reconocimiento facial...");
+
+    Swal.fire({
+      title: "Reconocimiento Facial",
+      text: "Iniciando cámara y modelos...",
+      icon: "info",
+      timer: 1500,
+      showConfirmButton: false,
+    });
 
     try {
-      const profesores = await axios.get(`${API_BASE_URL}/profesores`);
+      const usuarios = await axios.get(`${API_BASE_URL}/usuarios`);
       const labeledDescriptors = await Promise.all(
-        profesores.data.map(async (prof) => {
-          const encoding = JSON.parse(prof.face_encoding);
-          return new faceapi.LabeledFaceDescriptors(
-            prof.nombre,
-            [new Float32Array(encoding)]
-          );
-        })
+        usuarios.data
+          .filter((u) => u.face_encoding)
+          .map(async (u) => {
+            const encoding = JSON.parse(u.face_encoding);
+            return new faceapi.LabeledFaceDescriptors(
+              u.name,
+              [new Float32Array(encoding)]
+            );
+          })
       );
 
       const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.45);
@@ -106,13 +168,21 @@ export default function Login({ onLoginSuccess }) {
 
           if (bestMatch.label !== "unknown") {
             clearInterval(interval);
-            console.log(`✅ Profesor reconocido: ${bestMatch.label}`);
+            console.log(`✅ Usuario reconocido: ${bestMatch.label}`);
 
-            const profesor = profesores.data.find((p) => p.nombre === bestMatch.label);
-            if (profesor) {
-              await actualizarClaseEnCurso(profesor.id, profesor.nombre);
+            const usuario = usuarios.data.find((u) => u.name === bestMatch.label);
+            if (usuario) {
+              await actualizarClaseEnCurso(usuario.id, usuario.name);
+              onLoginSuccess();
+              navigate("/dashboard");
             } else {
-              setMensaje(`✅ Rostro autentificado con éxito: ${bestMatch.label}`);
+              Swal.fire({
+                icon: "success",
+                title: "Rostro reconocido",
+                text: `${bestMatch.label}`,
+                timer: 2000,
+                showConfirmButton: false,
+              });
               onLoginSuccess();
               navigate("/dashboard");
             }
@@ -121,7 +191,11 @@ export default function Login({ onLoginSuccess }) {
       }, 3000);
     } catch (error) {
       console.error("❌ Error en reconocimiento facial:", error);
-      setMensaje("Error en reconocimiento facial");
+      Swal.fire({
+        icon: "error",
+        title: "Error en reconocimiento",
+        text: "Ocurrió un problema al intentar identificar el rostro",
+      });
     }
   };
 
@@ -130,7 +204,6 @@ export default function Login({ onLoginSuccess }) {
       <div className="login-container">
         <div className="login-box">
           <img src="/logo_ucsg.png" alt="Logo CAD" className="logo" />
-
           {!faceMode ? (
             <>
               <form onSubmit={handleLogin}>
@@ -153,12 +226,11 @@ export default function Login({ onLoginSuccess }) {
               <button className="btn-facial" onClick={iniciarReconocimiento}>
                 Ingresar con Reconocimiento Facial
               </button>
-              <p>{mensaje}</p>
             </>
           ) : (
             <div className="facial-box">
               <Webcam ref={webcamRef} className="webcam" />
-              <p>{mensaje}</p>
+              <p>Escaneando rostro...</p>
             </div>
           )}
         </div>
